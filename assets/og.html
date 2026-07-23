@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  /* 1200×630 OG card — the 3×3 bit grid showing 755 beside rwxr-xr-x */
+  :root {
+    --bg: #F4EEE2; --bg2: #EDE4D2;
+    --ink: #2B2420; --soft: #5C5148;
+    --line: #D9CDB9; --rust: #A83E1C; --clay: #C97B5A;
+    --cell-off: #E8DFCC;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    background: linear-gradient(150deg, #F8F2E7 0%, var(--bg) 50%, var(--bg2) 100%);
+    font-family: var(--sans); color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    position: relative;
+  }
+  .frame {
+    position: absolute; inset: 0;
+    padding: 64px 76px;
+    display: flex; flex-direction: column; justify-content: space-between;
+  }
+  .brand { display: flex; align-items: center; gap: 18px; }
+  .brand svg { width: 62px; height: 62px; }
+  .wordmark { font-size: 52px; font-weight: 800; letter-spacing: -0.03em; }
+
+  .mid { display: flex; align-items: center; gap: 70px; }
+  .grid {
+    width: 300px; height: 300px; flex: none;
+    display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .c { border-radius: 20px; background: var(--rust);
+       box-shadow: inset 0 -5px 0 rgba(0,0,0,0.12), 0 12px 26px -14px rgba(43,36,32,0.4); }
+  .off { background: var(--cell-off); border: 3px solid var(--line); box-shadow: none; }
+
+  .txt h1 { font-size: 54px; font-weight: 800; letter-spacing: -0.03em; line-height: 1.12; max-width: 15ch; }
+  .txt h1 .r { color: var(--rust); }
+  .modes { margin-top: 26px; display: flex; align-items: baseline; gap: 22px; font-family: var(--mono); }
+  .modes .oct { font-size: 62px; font-weight: 700; color: var(--rust); }
+  .modes .eq { font-size: 40px; color: var(--soft); }
+  .modes .sym { font-size: 46px; font-weight: 600; letter-spacing: 0.06em; }
+
+  .chips { display: flex; gap: 12px; }
+  .chip {
+    border: 2px solid var(--line); border-radius: 999px;
+    background: rgba(255,252,245,0.6);
+    padding: 12px 22px; font-size: 22px; font-weight: 650; color: var(--soft);
+  }
+  .chip .sq { display: inline-block; width: 13px; height: 13px; border-radius: 4px; background: var(--rust); margin-right: 9px; }
+  .chip.alt .sq { background: var(--clay); }
+</style>
+</head>
+<body>
+  <div class="frame">
+    <div class="brand">
+      <svg viewBox="0 0 36 36" aria-hidden="true">
+        <rect width="36" height="36" rx="8" fill="#EDE3D0"/>
+        <rect x="4" y="4" width="8" height="8" rx="2" fill="#A83E1C"/><rect x="14" y="4" width="8" height="8" rx="2" fill="#A83E1C"/><rect x="24" y="4" width="8" height="8" rx="2" fill="#A83E1C"/>
+        <rect x="4" y="14" width="8" height="8" rx="2" fill="#A83E1C"/><rect x="14" y="14" width="8" height="8" rx="2" fill="#DFD5BF"/><rect x="24" y="14" width="8" height="8" rx="2" fill="#A83E1C"/>
+        <rect x="4" y="24" width="8" height="8" rx="2" fill="#A83E1C"/><rect x="14" y="24" width="8" height="8" rx="2" fill="#DFD5BF"/><rect x="24" y="24" width="8" height="8" rx="2" fill="#A83E1C"/>
+      </svg>
+      <span class="wordmark">permbits</span>
+    </div>
+
+    <div class="mid">
+      <div class="grid" aria-hidden="true">
+        <div class="c"></div><div class="c"></div><div class="c"></div>
+        <div class="c"></div><div class="c off"></div><div class="c"></div>
+        <div class="c"></div><div class="c off"></div><div class="c"></div>
+      </div>
+      <div class="txt">
+        <h1>Chmod in <span class="r">every direction</span></h1>
+        <div class="modes"><span class="oct">755</span><span class="eq">⇄</span><span class="sym">rwxr-xr-x</span></div>
+      </div>
+    </div>
+
+    <div class="chips">
+      <span class="chip"><span class="sq"></span>octal ⇄ symbolic ⇄ ls -l</span>
+      <span class="chip alt"><span class="sq"></span>umask &amp; special bits</span>
+      <span class="chip"><span class="sq"></span>24 cited recipes</span>
+      <span class="chip alt"><span class="sq"></span>offline</span>
+    </div>
+  </div>
+</body>
+</html>

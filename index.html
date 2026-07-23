@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'none'; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'">
+  <title>permbits — chmod calculator: octal ⇄ symbolic ⇄ ls -l, umask &amp; cited recipes</title>
+  <meta name="description" content="Chmod calculator that converts every direction — octal, symbolic, checkbox grid and pasted ls -l — with umask math, setuid/setgid/sticky bits and 24 cited permission recipes. Works fully offline.">
+  <meta name="color-scheme" content="light dark">
+  <link rel="canonical" href="https://sreenivas-sadhu-prabhakara.github.io/permbits/">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <meta name="author" content="Sreenivas Sadhu Prabhakara">
+  <meta name="keywords" content="chmod calculator, chmod 755 meaning, unix file permissions, ls -l explained, umask calculator, chmod 777, setuid setgid sticky bit, unprotected private key file, chmod 400 pem, symbolic chmod, octal permissions">
+  <meta name="theme-color" content="#221B15" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#F4EEE2" media="(prefers-color-scheme: light)">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="permbits">
+  <meta property="og:title" content="permbits — chmod calculator: octal ⇄ symbolic ⇄ ls -l">
+  <meta property="og:description" content="Convert Unix permissions in every direction, decode any ls -l line, do umask math and grab cited chmod recipes — offline, no tracking.">
+  <meta property="og:url" content="https://sreenivas-sadhu-prabhakara.github.io/permbits/">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:image" content="https://sreenivas-sadhu-prabhakara.github.io/permbits/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="permbits — a 3×3 permission bit grid showing 755 beside rwxr-xr-x">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="permbits — chmod calculator: octal ⇄ symbolic ⇄ ls -l">
+  <meta name="twitter:description" content="Convert Unix permissions in every direction, decode any ls -l line, do umask math and grab cited chmod recipes — offline, no tracking.">
+  <meta name="twitter:image" content="https://sreenivas-sadhu-prabhakara.github.io/permbits/og-image.png">
+  <meta name="twitter:image:alt" content="permbits — a 3×3 permission bit grid showing 755 beside rwxr-xr-x">
+
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+
+  <!-- Structured data (data blocks; not executable script) -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "permbits",
+    "description": "A chmod calculator that converts Unix file permissions in every direction — octal, symbolic string, checkbox grid and pasted ls -l — with umask arithmetic, setuid/setgid/sticky bits and 24 cited permission recipes. Runs fully offline.",
+    "url": "https://sreenivas-sadhu-prabhakara.github.io/permbits/",
+    "applicationCategory": "DeveloperApplication",
+    "operatingSystem": "Any (modern web browser)",
+    "browserRequirements": "Requires a modern web browser with JavaScript enabled.",
+    "isAccessibleForFree": true,
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "license": "https://opensource.org/licenses/MIT",
+    "author": { "@type": "Person", "name": "Sreenivas Sadhu Prabhakara" },
+    "softwareVersion": "0.1.0",
+    "featureList": [
+      "Four-way live converter: octal, 9-char symbolic, checkbox grid, chmod command",
+      "ls -l paste parser with setuid/setgid/sticky and ACL-marker detection",
+      "Symbolic chmod clause applier (u+x, go-w, a=rX) with before/after diff",
+      "Umask panel with the 666/777 arithmetic shown",
+      "24 hand-verified permission recipes with source citations",
+      "Plain-English explanation and risk warnings for any mode",
+      "Printable one-page cheat sheet",
+      "Runs 100% offline in your browser"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What does chmod 755 mean?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "755 is rwxr-xr-x: the owner can read, write and execute; the group and everyone else can read and execute but not write. On a directory, execute means permission to enter and traverse it. It is the standard mode for web directories and executable scripts."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "How do I fix the SSH error 'UNPROTECTED PRIVATE KEY FILE'?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Run chmod 600 on the key file (chmod 400 for AWS .pem keys). OpenSSH refuses private keys that other users can read; 600 makes the key readable and writable by you alone, which clears the warning."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "What is the difference between chmod 777 and 755?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "777 gives read, write and execute to everyone, so any local user or process can modify the file — almost never safe. 755 keeps write for the owner only while still letting everyone read and execute. If you are tempted by 777 to fix a web server error, the real fix is usually ownership, not permissions."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "Does permbits work offline and is my input private?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Yes. permbits is a static page with a Content-Security-Policy of connect-src 'none' — the browser itself blocks any network send. Everything you type stays on your device; the only storage is your browser's localStorage for your last mode and recent recipes."
+        }
+      }
+    ]
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#converter">Skip to the calculator</a>
+
+  <header class="hero">
+    <div class="wrap hero__inner">
+      <div class="hero__top">
+        <div class="brand" aria-hidden="true">
+          <svg class="brand__mark" viewBox="0 0 36 36" role="presentation">
+            <rect x="2"  y="2"  width="9" height="9" rx="2" class="bm-on"/>
+            <rect x="13" y="2"  width="9" height="9" rx="2" class="bm-on"/>
+            <rect x="24" y="2"  width="9" height="9" rx="2" class="bm-on"/>
+            <rect x="2"  y="13" width="9" height="9" rx="2" class="bm-on"/>
+            <rect x="13" y="13" width="9" height="9" rx="2" class="bm-off"/>
+            <rect x="24" y="13" width="9" height="9" rx="2" class="bm-on"/>
+            <rect x="2"  y="24" width="9" height="9" rx="2" class="bm-on"/>
+            <rect x="13" y="24" width="9" height="9" rx="2" class="bm-off"/>
+            <rect x="24" y="24" width="9" height="9" rx="2" class="bm-on"/>
+          </svg>
+          <span class="brand__name">permbits</span>
+        </div>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-pressed="false">Dark mode</button>
+      </div>
+      <p class="eyebrow">chmod &middot; umask &middot; setuid/setgid/sticky &middot; offline</p>
+      <h1>Chmod Calculator — Unix Permissions Explained: Octal ⇄ Symbolic ⇄ ls&nbsp;-l</h1>
+      <p class="lede">Type <code>755</code>, paste an <code>ls -l</code> line, tick the grid or apply <code>u+x</code> — every
+      representation updates the others instantly, with plain English, umask math and cited recipes for the situations
+      people actually search. No account, no network: the page’s security policy blocks any send.</p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ================= CONVERTER HUB ================= -->
+    <section id="converter" class="card" aria-labelledby="converter-h">
+      <h2 id="converter-h">The converter</h2>
+
+      <div class="kind-switch" role="radiogroup" aria-label="Interpret mode as a file or a directory">
+        <label class="kind-opt"><input type="radio" name="kind" id="kind-file" value="file" checked> <span>File</span></label>
+        <label class="kind-opt"><input type="radio" name="kind" id="kind-dir" value="dir"> <span>Directory</span></label>
+      </div>
+
+      <div class="hub">
+        <div class="hub__grid">
+          <table class="bitgrid" aria-label="Permission bit grid">
+            <thead>
+              <tr><td></td><th scope="col">read <span class="mono">r=4</span></th><th scope="col">write <span class="mono">w=2</span></th><th scope="col" id="x-head">execute <span class="mono">x=1</span></th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">owner</th>
+                <td><input type="checkbox" id="b-ur" data-bit="256" aria-label="owner read"></td>
+                <td><input type="checkbox" id="b-uw" data-bit="128" aria-label="owner write"></td>
+                <td><input type="checkbox" id="b-ux" data-bit="64" aria-label="owner execute"></td></tr>
+              <tr><th scope="row">group</th>
+                <td><input type="checkbox" id="b-gr" data-bit="32" aria-label="group read"></td>
+                <td><input type="checkbox" id="b-gw" data-bit="16" aria-label="group write"></td>
+                <td><input type="checkbox" id="b-gx" data-bit="8" aria-label="group execute"></td></tr>
+              <tr><th scope="row">other</th>
+                <td><input type="checkbox" id="b-or" data-bit="4" aria-label="other read"></td>
+                <td><input type="checkbox" id="b-ow" data-bit="2" aria-label="other write"></td>
+                <td><input type="checkbox" id="b-ox" data-bit="1" aria-label="other execute"></td></tr>
+            </tbody>
+          </table>
+
+          <fieldset class="specials">
+            <legend>Special bits</legend>
+            <label><input type="checkbox" id="b-setuid" data-bit="2048"> setuid <span class="mono">4000</span></label>
+            <label><input type="checkbox" id="b-setgid" data-bit="1024"> setgid <span class="mono">2000</span></label>
+            <label><input type="checkbox" id="b-sticky" data-bit="512"> sticky <span class="mono">1000</span></label>
+          </fieldset>
+        </div>
+
+        <div class="hub__fields">
+          <div class="field">
+            <label for="octal-in">Octal (3 or 4 digits)</label>
+            <input type="text" id="octal-in" class="mono big" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="4" value="644">
+            <p class="field-err" id="octal-err" role="status"></p>
+          </div>
+          <div class="field">
+            <label for="sym-in">Symbolic (9 characters)</label>
+            <input type="text" id="sym-in" class="mono big" autocomplete="off" spellcheck="false" maxlength="9" value="rw-r--r--">
+            <p class="field-err" id="sym-err" role="status"></p>
+          </div>
+          <div class="field">
+            <span class="field-label" id="cmd-label">chmod command</span>
+            <div class="cmdrow">
+              <code class="cmd mono" id="cmd-out" aria-labelledby="cmd-label">chmod 644 file</code>
+            </div>
+            <div class="copyrow">
+              <button type="button" class="btn" id="copy-cmd">Copy command</button>
+              <button type="button" class="btn" id="copy-octal">Copy octal</button>
+              <button type="button" class="btn" id="copy-sym">Copy symbolic</button>
+              <span class="copy-note" id="copy-note" aria-live="polite"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="explain" id="explain" aria-live="polite"></div>
+      <div class="warnings" id="warnings" aria-live="polite"></div>
+    </section>
+
+    <!-- ================= LS -L PARSER ================= -->
+    <section id="lsparse" class="card" aria-labelledby="lsparse-h">
+      <h2 id="lsparse-h">Paste an <span class="mono">ls -l</span> line</h2>
+      <p class="section-lede">A full line or just the 10/11-character mode field — permbits reads the type character,
+      the s/S/t/T letters and the trailing <span class="mono">+</span> ACL marker.</p>
+      <div class="lsrow">
+        <label class="visually-hidden" for="ls-in">ls -l line or mode field</label>
+        <input type="text" id="ls-in" class="mono" autocomplete="off" spellcheck="false"
+               placeholder="-rwsr-xr-x 1 root root 59976 Mar 23 2025 /usr/bin/passwd">
+        <button type="button" class="btn btn--primary" id="ls-parse">Decode</button>
+      </div>
+      <div id="ls-out" aria-live="polite"></div>
+    </section>
+
+    <!-- ================= CLAUSE APPLIER ================= -->
+    <section id="clauses" class="card" aria-labelledby="clauses-h">
+      <h2 id="clauses-h">Apply symbolic chmod clauses</h2>
+      <p class="section-lede">Type a clause list like <span class="mono">u+x</span>, <span class="mono">go-w</span>,
+      <span class="mono">a=rX</span> or <span class="mono">u=rw,go=</span> and see it applied to the current mode,
+      changed slots marked. Copy-from-class forms like <span class="mono">u=g</span> are not supported and say so.</p>
+      <div class="lsrow">
+        <label class="visually-hidden" for="clause-in">chmod clause list</label>
+        <input type="text" id="clause-in" class="mono" autocomplete="off" spellcheck="false" placeholder="u+x,go-w">
+        <button type="button" class="btn btn--primary" id="clause-apply">Preview</button>
+      </div>
+      <div id="clause-out" aria-live="polite"></div>
+    </section>
+
+    <!-- ================= UMASK ================= -->
+    <section id="umask" class="card" aria-labelledby="umask-h">
+      <h2 id="umask-h">Umask</h2>
+      <p class="section-lede">The umask is subtracted (bitwise) from what programs ask for: files request
+      <span class="mono">666</span>, directories <span class="mono">777</span>.</p>
+      <div class="umaskrow">
+        <label for="umask-in">umask</label>
+        <input type="text" id="umask-in" class="mono big" inputmode="numeric" autocomplete="off" spellcheck="false" maxlength="4" value="022">
+        <div class="umask-presets" role="group" aria-label="Common umasks">
+          <button type="button" class="btn" data-umask="022">022</button>
+          <button type="button" class="btn" data-umask="002">002</button>
+          <button type="button" class="btn" data-umask="077">077</button>
+        </div>
+      </div>
+      <div id="umask-out" aria-live="polite"></div>
+    </section>
+
+    <!-- ================= RECIPES ================= -->
+    <section id="recipes" class="card" aria-labelledby="recipes-h">
+      <h2 id="recipes-h">Cited recipes <span class="count-badge" id="recipe-count"></span></h2>
+      <p class="section-lede">The situations people actually search — each with the exact command, a one-line why,
+      the upstream citation and the date we verified it. Entries that vary by system are marked
+      <strong>beta</strong>: load them, then edit the octal to match your system.</p>
+      <div class="lsrow">
+        <label class="visually-hidden" for="recipe-search">Search recipes</label>
+        <input type="search" id="recipe-search" autocomplete="off" placeholder="Search: ssh, 755, sticky, wordpress…">
+      </div>
+      <div id="recent-recipes" class="recent" hidden>
+        <span class="recent__label">Recently used:</span>
+        <span id="recent-list"></span>
+      </div>
+      <div id="recipe-list" class="recipe-list"></div>
+      <p class="print-hint">Tip: printing this page produces a one-page cheat sheet of all 24 recipes.</p>
+    </section>
+
+    <!-- ================= CONCEPTS ================= -->
+    <section id="concepts" class="card" aria-labelledby="concepts-h">
+      <h2 id="concepts-h">The reference — 12 cited facts</h2>
+      <p class="section-lede">Special bits, umask arithmetic, the ls&nbsp;-l layout — each fact carries a verbatim quote
+      from POSIX, the GNU Coreutils manual or the relevant man page.</p>
+      <div id="concept-list" class="concept-list"></div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section id="faq" class="card" aria-labelledby="faq-h">
+      <h2 id="faq-h">FAQ</h2>
+      <details><summary>What does chmod 755 mean?</summary>
+        <p>755 is <span class="mono">rwxr-xr-x</span>: the owner can read, write and execute; group and others can read
+        and execute but not write. On a directory, execute means permission to enter and traverse it. It is the standard
+        mode for web directories and executable scripts.</p></details>
+      <details><summary>How do I fix “UNPROTECTED PRIVATE KEY FILE”?</summary>
+        <p>Run <span class="mono">chmod 600</span> on the key (<span class="mono">chmod 400</span> for AWS .pem keys).
+        OpenSSH refuses private keys other users can read. The recipe above cites the exact upstream wording.</p></details>
+      <details><summary>What is the difference between 777 and 755?</summary>
+        <p>777 lets every local user write to the file — almost never safe, and permbits flags it. 755 keeps write for
+        the owner only. If 777 “fixes” a web-server error, the real problem is usually ownership, not permissions.</p></details>
+      <details><summary>Does permbits work offline? Is my input private?</summary>
+        <p>Yes. This is a static page whose Content-Security-Policy is <span class="mono">connect-src 'none'</span> —
+        the browser itself blocks any network send. Your input never leaves this device; only your last mode and recent
+        recipes are kept in this browser’s localStorage.</p></details>
+    </section>
+
+    <!-- ================= HONEST LIMITS ================= -->
+    <section id="limits" class="card card--limits" aria-labelledby="limits-h">
+      <h2 id="limits-h">What permbits deliberately does not do</h2>
+      <ul class="limits">
+        <li>Classic POSIX mode bits only. The trailing <span class="mono">+</span> ACL marker in ls&nbsp;-l is recognised
+            and explained, but ACLs, SELinux/AppArmor contexts, capabilities and Windows permissions are out of scope —
+            use <span class="mono">getfacl</span>/<span class="mono">setfacl</span> and friends.</li>
+        <li>It cannot read or modify real files. It produces a command you run yourself — verify against your own system.</li>
+        <li>Recipes cite upstream man pages and vendor docs with a verified-on date; distro packaging can differ
+            (e.g. <span class="mono">/etc/shadow</span>), and such entries are flagged beta — load them, check your
+            system, and edit the octal to override.</li>
+        <li>ls&nbsp;-l parsing targets POSIX/GNU output; for exotic or localised formats paste just the 10-character mode field.</li>
+        <li>Symbolic clauses cover the everyday grammar (<span class="mono">ugoa</span>, <span class="mono">+-=</span>,
+            <span class="mono">rwxXst</span>, comma lists); copy-from-class forms like <span class="mono">u=g</span> are
+            rejected with a clear message. Clauses with no who letter (like <span class="mono">+x</span>) are treated as
+            <span class="mono">a</span> here; real chmod additionally masks those with your umask.</li>
+        <li>No ownership: <span class="mono">chown</span>/<span class="mono">chgrp</span> are different tools for a different job.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p><strong>permbits</strong> is an informational reference, not a substitute for your system’s documentation.
+      Modes and defaults were verified against the cited sources on the dates shown (corpus verified 2026-07-23);
+      distributions and vendors can change them. Always check <span class="mono">man chmod</span> and your distro’s
+      docs before changing permissions on system files. Provided “as is”, without warranty of any kind (MIT licence).</p>
+      <p>Privacy: this page ships with <span class="mono">connect-src 'none'</span> — the browser itself blocks any
+      network send. Nothing you type leaves your device.</p>
+      <p>© 2026 Sreenivas Sadhu Prabhakara · MIT licensed · <a href="https://github.com/Sreenivas-Sadhu-Prabhakara/permbits">source</a></p>
+    </div>
+  </footer>
+
+  <script src="data/engine.js"></script>
+  <script src="data/corpus.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

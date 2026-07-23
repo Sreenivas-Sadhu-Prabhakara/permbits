@@ -1,0 +1,24 @@
+{
+  "name": "permbits",
+  "short_name": "permbits",
+  "description": "Chmod calculator that converts Unix permissions in every direction — octal, symbolic, checkbox grid and pasted ls -l — with umask math and cited recipes. Works fully offline.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#F4EEE2",
+  "theme_color": "#A83E1C",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
