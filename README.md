@@ -72,7 +72,9 @@ and add/remove/idempotence property tests.
   differ (e.g. `/etc/shadow`), and such entries are flagged beta with a user override.
 - **Everyday symbolic grammar** (`ugoa`, `+-=`, `rwxXst`, comma lists). Copy-from-class
   forms like `u=g` are not parsed in v1. Clauses with no who letter are treated as `a`;
-  real chmod additionally masks those with your umask.
+  real chmod additionally masks those with your umask. On directories, `=` follows GNU
+  chmod and preserves setuid/setgid unless `s` is mentioned — POSIX leaves this
+  implementation-defined, so some systems clear them (use `u-s`/`g-s` to clear explicitly).
 - `ls -l` parsing targets POSIX/GNU output; for exotic formats paste just the mode field.
 - No `chown`/`chgrp`, no terminal emulation, no accounts, no network.
 

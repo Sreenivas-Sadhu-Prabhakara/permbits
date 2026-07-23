@@ -312,7 +312,10 @@
         <li>Symbolic clauses cover the everyday grammar (<span class="mono">ugoa</span>, <span class="mono">+-=</span>,
             <span class="mono">rwxXst</span>, comma lists); copy-from-class forms like <span class="mono">u=g</span> are
             rejected with a clear message. Clauses with no who letter (like <span class="mono">+x</span>) are treated as
-            <span class="mono">a</span> here; real chmod additionally masks those with your umask.</li>
+            <span class="mono">a</span> here; real chmod additionally masks those with your umask. On directories,
+            <span class="mono">=</span> follows GNU chmod and preserves setuid/setgid unless you mention
+            <span class="mono">s</span> — POSIX leaves this implementation-defined, so some systems clear them
+            (use <span class="mono">u-s</span>/<span class="mono">g-s</span> to clear explicitly).</li>
         <li>No ownership: <span class="mono">chown</span>/<span class="mono">chgrp</span> are different tools for a different job.</li>
       </ul>
     </section>

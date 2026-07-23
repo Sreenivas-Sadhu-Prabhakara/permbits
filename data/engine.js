@@ -138,6 +138,10 @@ const CLAUSE_RE = /^([ugoa]*)([+=-])([rwxXst]*)$/;
  * Apply a symbolic chmod clause list (e.g. "u+x,go-w", "a=rX", "u=rw,go=") to a mode.
  * opts.isDir affects capital X. Copy-from-class forms (u=g) are rejected with a clear error.
  * A clause with no who letters is treated as "a" (real chmod also masks those with your umask).
+ * On directories, "=" preserves setuid/setgid unless "s" is mentioned — the behaviour the
+ * GNU Coreutils manual documents ("a command like chmod does not affect the set-user-ID or
+ * set-group-ID bits of a directory unless the user specifically mentions them"); POSIX
+ * leaves it implementation-defined, so some systems clear them (use u-s/g-s to clear).
  */
 function applyChmod(mode, clauseList, opts) {
   const isDir = !!(opts && opts.isDir);
@@ -189,11 +193,13 @@ function applyChmod(mode, clauseList, opts) {
       result &= ~addBits;
     } else { // '='
       let clearBits = 0;
+      // GNU chmod preserves a directory's setuid/setgid on "=" unless s is mentioned.
+      const clearSpecial = !isDir || perms.includes('s');
       for (const cls of classes) {
         const shift = cls === 'u' ? 6 : cls === 'g' ? 3 : 0;
         clearBits |= 7 << shift;
-        if (cls === 'u') clearBits |= SETUID;
-        if (cls === 'g') clearBits |= SETGID;
+        if (cls === 'u' && clearSpecial) clearBits |= SETUID;
+        if (cls === 'g' && clearSpecial) clearBits |= SETGID;
         if (cls === 'o') clearBits |= STICKY;
       }
       result = (result & ~clearBits) | addBits;

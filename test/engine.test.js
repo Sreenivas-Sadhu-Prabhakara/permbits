@@ -87,6 +87,15 @@ test('applyChmod — assignment resets the class', () => {
   assert.equal(E.applyChmod(0o644, 'a=rX', { isDir: true }), 0o555);
 });
 
+test('applyChmod — "=" on a directory preserves setuid/setgid unless s is mentioned (GNU semantics)', () => {
+  assert.equal(E.applyChmod(0o2775, 'g=rx', { isDir: true }), 0o2755);   // setgid kept
+  assert.equal(E.applyChmod(0o2775, 'g=rx', { isDir: false }), 0o755);   // file: cleared
+  assert.equal(E.applyChmod(0o2775, 'g=rx,g-s', { isDir: true }), 0o755); // explicit clear works
+  assert.equal(E.applyChmod(0o4755, 'u=rw', { isDir: true }), 0o4655);   // setuid kept on dir
+  assert.equal(E.applyChmod(0o2775, 'g=rxs', { isDir: true }), 0o2755);  // s mentioned: set
+  assert.equal(E.applyChmod(0o1777, 'o=rx', { isDir: true }), 0o775);    // sticky IS cleared by o=
+});
+
 test('applyChmod — special bits via s and t', () => {
   assert.equal(E.applyChmod(0o755, 'u+s'), 0o4755);
   assert.equal(E.applyChmod(0o775, 'g+s'), 0o2775);

@@ -216,7 +216,9 @@
     if (res.aclChar) {
       rows.push(['Marker', res.hasAclMarker
         ? `trailing “+”: an alternate access method (such as a POSIX ACL) ALSO applies — these nine bits are not the whole story. Reading ACLs is beyond this tool; use getfacl.`
-        : `trailing “${res.aclChar}”: an alternate access method marker (e.g. SELinux context for “.”) — beyond this tool.`]);
+        : res.aclChar === '.'
+          ? 'trailing “.”: GNU ls marks an SELinux security context — the nine classic bits still apply, but the context is beyond this tool.'
+          : 'trailing “@”: macOS/BSD ls marks extended attributes — metadata beyond this tool; the nine classic bits still apply.']);
     }
     const dl = document.createElement('dl');
     rows.forEach(([k, v]) => {
@@ -503,5 +505,6 @@
   renderRecipes('');
   renderRecent();
   renderConcepts();
+  renderUmask();
   render();
 })();
